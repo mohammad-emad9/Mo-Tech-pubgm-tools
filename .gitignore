@@ -1,8 +1,16 @@
-__pycache__/
-build/
-dist/
-*.spec
-*.pyc
-.vscode/
-.idea/
-*.log
+# Ignore everything
+/*
+
+# Allow specific files/directories
+!README.md
+!screenshots/
+!assets/
+!assets/icons/
+!assets/icons/logo.ico
+!.gitignore
+
+# Re-ignore everything inside assets EXCEPT icons
+/assets/*
+!/assets/icons/
+/assets/icons/*
+!/assets/icons/logo.ico
