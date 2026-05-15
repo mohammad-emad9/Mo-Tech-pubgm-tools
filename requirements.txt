@@ -1,0 +1,10 @@
+# Mo-Tech pubgm Requirements
+# Python 3.8+
+
+# GUI Framework (included with Python standard library)
+# tkinter
+
+# Additional dependencies for future enhancements
+# pywin32 - For advanced Windows registry operations
+# psutil - For system monitoring and process management
+# requests - For downloading drivers and updates

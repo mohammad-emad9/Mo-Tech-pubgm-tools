@@ -1,0 +1,11 @@
+{
+    "fps_limit": 60,
+    "graphics_quality": "Smooth",
+    "visual_style": "Classic",
+    "rendering_mode": "DirectX+",
+    "shader_cache": true,
+    "global_render_cache": true,
+    "hardware_priority": "High",
+    "ipad_view": false,
+    "resolution": "1920x1080"
+}
