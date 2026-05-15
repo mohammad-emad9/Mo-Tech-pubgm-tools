@@ -72,3 +72,114 @@ Whether you are suffering from micro-stutters, low FPS, or slow rendering, Mo-Te
     <a href="https://discord.com/users/elitemohmmad"><img src="https://img.shields.io/badge/Discord-elitemohmmad-7289DA?style=for-the-badge&logo=discord"></a>
   </p>
 </div>
+
+---
+
+## 🚀 Installation & Usage
+
+### Prerequisites
+- **Python 3.8** or higher
+- **Tkinter** (usually included with Python)
+- **Windows OS** (for full functionality)
+- **Administrator privileges** (recommended for all features)
+
+### Quick Start
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/mohammad-emad-dev/Mo-Tech-pubgm-tools.git
+   cd Mo-Tech-pubgm-tools
+   ```
+
+2. **Run the setup wizard:**
+   ```bash
+   python setup.py
+   ```
+
+3. **Launch the application:**
+   ```bash
+   python src/main.py
+   ```
+
+   Or on Windows, run as Administrator:
+   ```bash
+   Right-click on main.py > Run as Administrator
+   ```
+
+### Building Standalone Executable (Windows)
+
+To create a standalone `.exe` file:
+
+```bash
+python build.py
+```
+
+The executable will be created in the `dist/` folder.
+
+### Configuration
+
+All settings are saved in `assets/configs/settings.json`. You can manually edit this file to customize default values.
+
+---
+
+## 📁 Project Structure
+
+```
+Mo-Tech-pubgm-tools/
+├── src/
+│   └── main.py              # Main application code
+├── assets/
+│   ├── icons/
+│   │   └── logo.ico         # Application icon
+│   ├── configs/
+│   │   └── settings.json    # User settings
+│   └── logs/                # Application logs
+├── screenshots/             # UI screenshots
+├── setup.py                 # Setup wizard
+├── build.py                 # Build script for .exe
+├── requirements.txt         # Python dependencies
+├── README.md                # This file
+└── LICENSE                  # MIT License
+```
+
+---
+
+## 🔧 Features Breakdown
+
+### Main Tab (GFX Control)
+- **FPS Limiter:** Choose between 30, 60, 90, or 120 FPS
+- **Graphics Quality:** Smooth, Balanced, HD, HDR, Ultra HDR
+- **Visual Styles:** Classic, Colorful, Realistic, Soft, Movie
+
+### Engine Settings Tab
+- **Rendering Mode:** DirectX+ or OpenGL+
+- **Shader Caching:** Enable/disable for better performance
+- **Global Rendering Cache:** Optimize rendering pipeline
+- **Hardware Priority:** Normal, High, or Realtime
+- **AI Optimization:** One-click smart optimization
+
+### Optimizer Arsenal Tab
+- **GameLoop Super ⚡:** Launch with high priority
+- **Magic Button:** Clean temp files + registry tweaks
+- **Driver Installation:** Auto-install Visual C++ runtimes
+- **iPad View:** Custom resolutions for wider FOV
+
+---
+
+## ⚠️ Important Disclaimer
+
+- This application modifies Windows system settings and registry keys. **Always run as Administrator**.
+- **Mo-Tech pubgm** is an independent utility and is **NOT** officially affiliated with PUBG Mobile, Tencent, or GameLoop. 
+- Use the tool at your own risk.
+
+---
+
+## 👨‍💻 Developed By
+
+<div align="center">
+  <h3>Mohammed Emad</h3>
+  <p>
+    <a href="https://github.com/mohammad-emad9"><img src="https://img.shields.io/badge/GitHub-mohammad--emad9-purple?style=for-the-badge&logo=github"></a>
+    <a href="https://discord.com/users/elitemohmmad"><img src="https://img.shields.io/badge/Discord-elitemohmmad-7289DA?style=for-the-badge&logo=discord"></a>
+  </p>
+</div>
