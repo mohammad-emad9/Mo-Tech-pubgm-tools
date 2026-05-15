@@ -1,18 +1,29 @@
 """
 Mo-Tech pubgm - The Ultimate GameLoop & PUBG Mobile Optimization Suite
 Developed by: Mohammed Emad
-Version: v1.0.8
+Version: v2.0.0
+Features Added:
+- Advanced Profile System (Save/Load configurations)
+- Real-time Performance Monitoring (CPU/RAM usage)
+- Enhanced Gaming Mode
+- Operation Logging System
+- Backup & Restore System
+- Settings Validation
 """
 
 import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import ttk, messagebox, filedialog
 import json
 import os
 import sys
 import subprocess
 import shutil
 import ctypes
+import threading
+import time
+import datetime
 from pathlib import Path
+from typing import Optional, Dict, Any
 
 # Check if running as administrator
 def is_admin():
@@ -24,8 +35,8 @@ def is_admin():
 class MoTechApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("Mo-Tech pubgm - Ultimate Optimization Suite")
-        self.root.geometry("900x700")
+        self.root.title("Mo-Tech pubgm - Ultimate Optimization Suite v2.0")
+        self.root.geometry("1000x750")
         self.root.resizable(True, True)
         
         # Set icon
@@ -37,12 +48,43 @@ class MoTechApp:
         # Configuration paths
         self.gameloop_path = self.find_gameloop_path()
         self.config_file = "assets/configs/settings.json"
+        self.profiles_dir = "assets/configs/profiles"
+        self.logs_dir = "assets/logs"
+        self.backup_dir = "assets/backups"
+        
+        # Initialize logging system
+        self.log_file = os.path.join(self.logs_dir, f"operations_{datetime.datetime.now().strftime('%Y%m%d')}.log")
+        self.setup_logging()
         
         # Load settings
         self.settings = self.load_settings()
         
+        # Performance monitoring flags
+        self.monitoring_active = False
+        self.monitor_thread = None
+        
         # Create main interface
         self.create_main_interface()
+        
+        # Log application start
+        self.log_operation("Application started", "INFO")
+    
+    def setup_logging(self):
+        """Initialize logging system"""
+        os.makedirs(self.logs_dir, exist_ok=True)
+        os.makedirs(self.profiles_dir, exist_ok=True)
+        os.makedirs(self.backup_dir, exist_ok=True)
+    
+    def log_operation(self, message: str, level: str = "INFO"):
+        """Log operations to file"""
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        log_entry = f"[{timestamp}] [{level}] {message}\n"
+        
+        try:
+            with open(self.log_file, 'a', encoding='utf-8') as f:
+                f.write(log_entry)
+        except Exception as e:
+            print(f"Logging error: {e}")
     
     def find_gameloop_path(self):
         """Find GameLoop installation path"""
@@ -96,10 +138,141 @@ class MoTechApp:
         """Save current settings to config file"""
         try:
             os.makedirs(os.path.dirname(self.config_file), exist_ok=True)
-            with open(self.config_file, 'w') as f:
-                json.dump(self.settings, f, indent=4)
+            with open(self.config_file, 'w', encoding='utf-8') as f:
+                json.dump(self.settings, f, indent=4, ensure_ascii=False)
+            self.log_operation("Settings saved successfully", "INFO")
         except Exception as e:
             messagebox.showerror("Error", f"Failed to save settings: {str(e)}")
+            self.log_operation(f"Failed to save settings: {str(e)}", "ERROR")
+    
+    def validate_settings(self) -> bool:
+        """Validate current settings"""
+        try:
+            # Validate FPS
+            if self.settings.get("fps_limit") not in [30, 60, 90, 120]:
+                raise ValueError("Invalid FPS limit")
+            
+            # Validate graphics quality
+            valid_qualities = ["Smooth", "Balanced", "HD", "HDR", "Ultra HDR"]
+            if self.settings.get("graphics_quality") not in valid_qualities:
+                raise ValueError("Invalid graphics quality")
+            
+            # Validate rendering mode
+            if self.settings.get("rendering_mode") not in ["DirectX+", "OpenGL+"]:
+                raise ValueError("Invalid rendering mode")
+            
+            return True
+        except Exception as e:
+            self.log_operation(f"Settings validation failed: {str(e)}", "WARNING")
+            return False
+    
+    def create_backup(self) -> str:
+        """Create backup of current settings"""
+        try:
+            timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+            backup_file = os.path.join(self.backup_dir, f"backup_{timestamp}.json")
+            
+            with open(backup_file, 'w', encoding='utf-8') as f:
+                json.dump(self.settings, f, indent=4)
+            
+            self.log_operation(f"Backup created: {backup_file}", "INFO")
+            return backup_file
+        except Exception as e:
+            self.log_operation(f"Failed to create backup: {str(e)}", "ERROR")
+            return None
+    
+    def restore_backup(self, backup_file: str) -> bool:
+        """Restore settings from backup"""
+        try:
+            with open(backup_file, 'r', encoding='utf-8') as f:
+                self.settings = json.load(f)
+            
+            self.save_settings()
+            self.log_operation(f"Backup restored: {backup_file}", "INFO")
+            return True
+        except Exception as e:
+            self.log_operation(f"Failed to restore backup: {str(e)}", "ERROR")
+            return False
+    
+    def save_profile(self, profile_name: str) -> bool:
+        """Save current settings as a profile"""
+        try:
+            profile_file = os.path.join(self.profiles_dir, f"{profile_name}.json")
+            with open(profile_file, 'w', encoding='utf-8') as f:
+                json.dump(self.settings, f, indent=4)
+            
+            self.log_operation(f"Profile saved: {profile_name}", "INFO")
+            return True
+        except Exception as e:
+            self.log_operation(f"Failed to save profile: {str(e)}", "ERROR")
+            return False
+    
+    def load_profile(self, profile_name: str) -> bool:
+        """Load settings from a profile"""
+        try:
+            profile_file = os.path.join(self.profiles_dir, f"{profile_name}.json")
+            if not os.path.exists(profile_file):
+                return False
+            
+            with open(profile_file, 'r', encoding='utf-8') as f:
+                self.settings = json.load(f)
+            
+            self.save_settings()
+            self.log_operation(f"Profile loaded: {profile_name}", "INFO")
+            return True
+        except Exception as e:
+            self.log_operation(f"Failed to load profile: {str(e)}", "ERROR")
+            return False
+    
+    def get_available_profiles(self) -> list:
+        """Get list of available profiles"""
+        try:
+            profiles = []
+            if os.path.exists(self.profiles_dir):
+                for file in os.listdir(self.profiles_dir):
+                    if file.endswith('.json'):
+                        profiles.append(file[:-5])  # Remove .json extension
+            return profiles
+        except Exception as e:
+            self.log_operation(f"Failed to get profiles: {str(e)}", "ERROR")
+            return []
+    
+    def start_performance_monitor(self):
+        """Start performance monitoring thread"""
+        self.monitoring_active = True
+        self.monitor_thread = threading.Thread(target=self._monitor_performance, daemon=True)
+        self.monitor_thread.start()
+        self.log_operation("Performance monitoring started", "INFO")
+    
+    def stop_performance_monitor(self):
+        """Stop performance monitoring"""
+        self.monitoring_active = False
+        if self.monitor_thread:
+            self.monitor_thread.join(timeout=2.0)
+        self.log_operation("Performance monitoring stopped", "INFO")
+    
+    def _monitor_performance(self):
+        """Monitor CPU and RAM usage (Windows only)"""
+        while self.monitoring_active:
+            try:
+                if sys.platform == 'win32':
+                    import psutil
+                    cpu_usage = psutil.cpu_percent(interval=1)
+                    ram_usage = psutil.virtual_memory().percent
+                    
+                    # Update GUI in main thread
+                    if hasattr(self, 'cpu_label') and hasattr(self, 'ram_label'):
+                        self.root.after(0, lambda: self.cpu_label.config(text=f"CPU: {cpu_usage}%"))
+                        self.root.after(0, lambda: self.ram_label.config(text=f"RAM: {ram_usage}%"))
+                else:
+                    # Fallback for non-Windows systems
+                    self.root.after(0, lambda: self.cpu_label.config(text="CPU: N/A"))
+                    self.root.after(0, lambda: self.ram_label.config(text="RAM: N/A"))
+                
+                time.sleep(2)
+            except Exception as e:
+                self.log_operation(f"Monitoring error: {str(e)}", "WARNING")
+                time.sleep(5)
     
     def create_main_interface(self):
         """Create the main tabbed interface"""
@@ -111,16 +284,31 @@ class MoTechApp:
         self.main_tab = ttk.Frame(self.notebook)
         self.engine_tab = ttk.Frame(self.notebook)
         self.optimizer_tab = ttk.Frame(self.notebook)
+        self.profiles_tab = ttk.Frame(self.notebook)  # New profiles tab
         
         # Add tabs to notebook
         self.notebook.add(self.main_tab, text="🎮 GFX Control")
         self.notebook.add(self.engine_tab, text="⚙️ Engine Settings")
         self.notebook.add(self.optimizer_tab, text="🚀 Optimizer Arsenal")
+        self.notebook.add(self.profiles_tab, text="📁 Profiles & Backup")  # New tab
         
         # Build each tab
         self.build_main_tab()
         self.build_engine_tab()
         self.build_optimizer_tab()
+        self.build_profiles_tab()  # Build new tab
+        
+        # Start performance monitoring
+        self.start_performance_monitor()
+        
+        # Bind close event to stop monitoring
+        self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
+    
+    def on_closing(self):
+        """Handle application closing"""
+        self.stop_performance_monitor()
+        self.log_operation("Application closed", "INFO")
+        self.root.destroy()
     
     def build_main_tab(self):
         """Build the main GFX control tab"""
