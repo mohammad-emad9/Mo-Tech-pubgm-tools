@@ -1,25 +1,23 @@
-# Ignore everything
-/*
+```
+# Compiled and build artifacts
+*.pyc
+__pycache__/
 
-# Allow specific files/directories
-!README.md
-!screenshots/
-!assets/
-!assets/icons/
-!assets/icons/logo.ico
-!assets/configs/
-!assets/logs/
-!.gitignore
-!src/
-!setup.py
-!build.py
-!requirements.txt
-!LICENSE
+# Dependencies
+.venv/
+venv/
 
-# Re-ignore everything inside assets EXCEPT icons and configs
-/assets/*
-!/assets/icons/
-/assets/icons/*
-!/assets/icons/logo.ico
-!/assets/configs/
-!/assets/logs/
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+
+# Environment
+.env
+.env.local
+*.env.*
+
+# Editors
+.vscode/
+.idea/
+```
